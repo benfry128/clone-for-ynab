@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 import requests
-from pprint import pprint
 
 load_dotenv()
 YNAB_API_KEY = os.getenv('YNAB_API_KEY')
@@ -20,46 +19,35 @@ new_acc_dict = {acc['name']: acc['id'] for acc in new_budget['accounts']}
 transactions_dict = {'transactions': []}
 
 transactions = s.get(f'{YNAB_URL}/budgets/{old_id}/transactions').json()['data']['transactions']
-print(len(transactions))
 for t in transactions:
-    if not t['transfer_transaction_id'] and not t['subtransactions'] and not t['payee_name'] == 'Starting Balance':
-        continue
+    starting_balance = t['payee_name'] == 'Starting Balance'
+    transfer = 'Transfer' in t['payee_name']
+    if not t['subtransactions']:
         transactions_dict['transactions'].append({
             'account_id': new_acc_dict[t['account_name']],
             'date': t['date'],
             'amount': t['amount'],
-            'payee_name': t['payee_name'],
-            'category_id': new_cat_dict[t['category_name']],
+            'payee_name': t['payee_name'] if not starting_balance and not transfer else t['payee_name'].replace('a', '@', 1),
+            'category_id': new_cat_dict[t['category_name']] if not transfer else new_cat_dict['Transfers'],
             'memo': t['memo'],
             'cleared': t['cleared'],
             'approved': t['approved'],
             'flag_color': t['flag_color']
         })
-    if not t['subtransactions'] and t['payee_name'] != 'Starting Balance' and 'Discover' not in t['payee_name'] and 'Quicksilver' not in t['payee_name'] and 'Discover' not in t['account_name'] and 'Quicksilver' not in t['account_name']:
+    for sub in t['subtransactions']:
         transactions_dict['transactions'].append({
             'account_id': new_acc_dict[t['account_name']],
             'date': t['date'],
-            'amount': t['amount'],
-            'payee_name': t['payee_name'],
-            'category_id': new_cat_dict[t['category_name']],
-            'memo': t['memo'],
+            'amount': sub['amount'],
+            'payee_name': sub['payee_name'],
+            'category_id': new_cat_dict[sub['category_name']],
+            'memo': sub['memo'],
             'cleared': t['cleared'],
             'approved': t['approved'],
             'flag_color': t['flag_color']
         })
-        print(transactions_dict)
-        result = s.post(f'{YNAB_URL}/budgets/{new_id}/transactions', json=transactions_dict)
-        print(result.json())
-        # for row in result:
-        #     print(result[row])
-        pprint(t)
 
-        input("HI")
-        # input("HI")
-
-print(len(transactions_dict['transactions']))
-
-print(result)
+result = s.post(f'{YNAB_URL}/budgets/{new_id}/transactions', json=transactions_dict)
 
 # first month, last month
 # months (budget info I think)
