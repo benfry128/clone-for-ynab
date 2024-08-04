@@ -36,11 +36,13 @@ for t in transactions:
             'flag_color': t['flag_color']
         })
     for sub in t['subtransactions']:
+        transfer = sub['payee_name'] and 'Transfer' in sub['payee_name']
+
         transactions_dict['transactions'].append({
             'account_id': new_acc_dict[t['account_name']],
             'date': t['date'],
             'amount': sub['amount'],
-            'payee_name': sub['payee_name'],
+            'payee_name': sub['payee_name'] if not starting_balance and not transfer else sub['payee_name'].replace('a', '@', 1),
             'category_id': new_cat_dict[sub['category_name']],
             'memo': sub['memo'],
             'cleared': t['cleared'],
@@ -49,8 +51,5 @@ for t in transactions:
         })
 
 result = s.post(f'{YNAB_URL}/budgets/{NEW_ID}/transactions', json=transactions_dict)
-
-# first month, last month
-# months (budget info I think)
-# transactions
-# sub-transactions
+if 'error' in result.json():
+    print(result.json())
