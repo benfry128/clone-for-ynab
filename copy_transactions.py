@@ -5,12 +5,11 @@ import requests
 load_dotenv()
 OLD_ID = os.getenv('OLD_BUDGET_ID')
 NEW_ID = os.getenv('NEW_BUDGET_ID')
-YNAB_API_KEY = os.getenv('YNAB_API_KEY')
 
 YNAB_URL = 'https://api.ynab.com/v1'
 
 s = requests.Session()
-s.headers.update({'Authorization': f'Bearer {YNAB_API_KEY}'})
+s.headers.update({'Authorization': f'Bearer {input('All right bro we need an API key: ')}'})
 
 new_budget = s.get(f'{YNAB_URL}/budgets/{NEW_ID}').json()['data']['budget']
 
