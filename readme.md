@@ -7,9 +7,9 @@ The copy will include accounts, categories, transactions, and previously budgete
 
 Clone the repo to your local machine.
 Log into YNAB and navigate to the budget you'd like to copy, then hit Make a Fresh Start.
-Add a category called 'Transfers' somewhere in the new budget (see why [below](#things-this-software-does-and-doesnt-do))
+Add a category called 'Transfers' somewhere in the new budget (see why [below](#things-this-software-does-and-doesnt-do)).
 Copy the budget ids from the URLs of the original (archived) budget as well as the new (Fresh Start) budget.
-Create a .env file in the folder and add `OLD_BUDGET_ID=<your old budget id>` and `NEW_BUDGET_ID=<your new budget id>`
+Create a .env file in the folder and add `OLD_BUDGET_ID=<your old budget id>` and `NEW_BUDGET_ID=<your new budget id>`. 
 Run copy_transactions.py, then copy_months.py, creating YNAB API keys and inputting them into the terminal as needed.
 If your budget is large enough, you may see errors about network throttling after running copy_months.py for a while.
 If this happens, follow the instructions near the top of copy_months.py to continue the process.
